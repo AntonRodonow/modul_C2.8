@@ -1,3 +1,6 @@
+from random import randint
+
+
 class Dot:  # Класс Точка на доске
     def __init__(self, x, y):
         self.x = x
@@ -6,8 +9,8 @@ class Dot:  # Класс Точка на доске
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
-    def __repr__(self):
-        return f'({self.x}, {self.y})'
+    def __repr__(self):  # не понял зачем он нужен
+        return f'({self.x!r}, {self.y!r})'
 
 
 class BoardException(Exception):  # Класс Исключения
@@ -30,16 +33,16 @@ class BoardWrongShipExeption(BoardException):
 
 class Ship:  # Класс корабля
     def __init__(self, bow, l, o):
-        self.bow = bow
-        self.l = l
-        self.o = o
-        self.lives = l
+        self.bow = bow  # объект класса точка (x y), начальная у корабля (верхний левый угол)
+        self.l = l  # длина корабля
+        self.o = o  # рандомно между 0 и 1 расположение по горизонтали или вертикали корабля
+        self.lives = l  # жизни корабля
 
     @property
     def dots(self):
         ship_dots = []
         for i in range(self.l):
-            cur_x = self.bow.x
+            cur_x = self.bow.x  # Ship(Dot(randint(0, self.size), randint(0, self.size)), l, randint(0, 1))    board.add_ship(ship)    for d in ship.dots:
             cur_y = self.bow.y
             if self.o == 0:
                 cur_x += i
@@ -61,10 +64,10 @@ class Board:  # Класс игровой доски
         self.busy = []
         self.ships = []
 
-    def add_ship(self, ship):
-        for d in ship.dots:
+    def add_ship(self, ship):  # board.add_ship(ship)    ship = Ship(Dot(randint(0, self.size), randint(0, self.size)), l, randint(0, 1))
+        for d in ship.dots:  # итерация по списку из объектов точек для каждого объекта класса корабль
             if self.out(d) or d in self.busy:
-                raise BoardWrongShipExeption()
+                raise BoardWrongShipExeption()  # поднимая ошибку код данного метода прерывается
         for d in ship.dots:
             self.field[d.x][d.y] = "■"
             self.busy.append(d)
@@ -94,7 +97,7 @@ class Board:  # Класс игровой доски
             res = res.replace("■", "O")
         return res
 
-    def out(self, d):
+    def out(self, d):  # принимает объект класса точка и проверят ее на возможность вхождения в игровое поле
         return not ((0 <= d.x < self.size) and (0 <= d.y < self.size))
 
     def shot(self, d):
@@ -116,7 +119,6 @@ class Board:  # Класс игровой доски
                     print("Корабль ранен!")
                     return True
         self.field[d.x][d.y] = "."
-
         print("Мимо!")
         return False
 
@@ -126,12 +128,12 @@ class Board:  # Класс игровой доски
 
 class Game:  # Класс игрового процесса
     def __init__(self, size=6):
-        self.size = size
-        pl = self.random_board()
-        co = self.random_board()
-        co.hid = True
-        self.ai = AI(co, pl)
-        self.us = User(pl, co)
+        self.size = size  # размер доски, по умолчанию
+        pl = self.random_board()  # доска человека
+        co = self.random_board()  # доска компьютера
+        co.hid = True  # прячет доску компьютера
+        self.ai = AI(co, pl)  # компьютер (computer, player)
+        self.us = User(pl, co)  # игрок (игрок, компьютер)
 
     def random_board(self):
         board = None
@@ -141,7 +143,7 @@ class Game:  # Класс игрового процесса
 
     def random_place(self):
         lens = [3, 2, 2, 1, 1, 1, 1]
-        board = Board(size=self.size)
+        board = Board(size=self.size)  # создание пустой игрой доски объекта класса
         attempts = 0
         for l in lens:
             while True:
@@ -157,7 +159,8 @@ class Game:  # Класс игрового процесса
         board.begin()
         return board
 
-    def greet(self):
+    @staticmethod
+    def greet():
         print("--------------------")
         print("  Приветствуем вас  ")
         print("       в игре       ")
@@ -184,6 +187,7 @@ class Game:  # Класс игрового процесса
                 print("-" * 20)
                 print("Ходит компьютер!")
                 repeat = self.ai.move()
+            print(num, 'num')
             if repeat:
                 num -= 1
             if self.ai.board.count == 7:
@@ -197,11 +201,8 @@ class Game:  # Класс игрового процесса
             num += 1
 
     def start(self):
-        self.greet()
+        Game.greet()
         self.loop()
-
-
-from random import randint
 
 
 class Player:
@@ -210,7 +211,7 @@ class Player:
         self.board = board
         self.enemy = enemy
 
-    def ask(self):
+    def ask(self):  # не реализованная ошибка (не используется в процессе игры)
         raise NotImplementedError()
 
     def move(self):
